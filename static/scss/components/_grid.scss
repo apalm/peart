@@ -1,0 +1,17 @@
+.Grid {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0.5em 0;
+  padding: 0;
+  align-items: center;
+}
+
+.Grid-cell {
+  flex: 1;
+  margin: 0 1em 0 0;
+  align-self: center;
+  input[type=range] {
+    width: 100%;
+  }
+}

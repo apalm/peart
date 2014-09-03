@@ -1,0 +1,23 @@
+{
+  "name": "peart",
+  "version": "0.0.1",
+  "description": "Web Audio drum machine.",
+  "license": "MIT",
+  "author": "Andrew Palm",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apalm/peart.git"
+  },
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "react": "^0.11.1"
+  },
+  "devDependencies": {
+    "es6ify": "^1.2.0",
+    "gulp": "^3.8.5",
+    "gulp-browserify": "^0.5.0",
+    "gulp-minify-css": "^0.3.6",
+    "gulp-sass": "^0.7.2",
+    "gulp-uglify": "^0.3.1"
+  }
+}

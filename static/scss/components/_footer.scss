@@ -1,0 +1,16 @@
+footer {
+  padding: 1.5rem 1.5rem;
+  background: $black0;
+  color: $black1;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.Footer-credits {
+  margin: 0;
+  padding: 0;
+  span {
+    display: inline-block;
+    margin: 0 0.25em;
+  }
+}
