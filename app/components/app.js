@@ -112,10 +112,11 @@ var App = React.createClass({
     request.onload = function() {
       this.props.audioContext.decodeAudioData(request.response, function(buf) {
         var channelList = this.state.channelList.slice(0);
-        channelList[utils.lookupChannelIndex(channelList, channelId)].buffer = buf;
+        channelList[utils.lookupChannelIndex(channelList, channelId)]
+          .buffer = buf;
         this.setChannelList(channelList);
       }.bind(this));
-    }.bind(this)
+    }.bind(this);
     request.send();
   },
   setChannelList: function(channelList) {
@@ -162,11 +163,15 @@ var App = React.createClass({
 
     var panner = this.props.audioContext.createPanner();
     panner.panningModel = 'equalpower';
-    panner.setPosition(this.state.channelList[i].pan, 0, (1 - Math.abs(this.state.channelList[i].pan)));
+    panner.setPosition(
+      this.state.channelList[i].pan,
+      0,
+      (1 - Math.abs(this.state.channelList[i].pan)));
 
     // Prevent clipping when panned.
     var gainNode = this.props.audioContext.createGain();
-    gainNode.gain.value = (this.state.channelList[i].isMuted ? 0 : this.state.channelList[i].volume * 0.8);
+    gainNode.gain.value = (this.state.channelList[i].isMuted ?
+      0 : (this.state.channelList[i].volume * 0.8));
 
     source.connect(panner);
     panner.connect(gainNode);

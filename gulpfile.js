@@ -4,6 +4,7 @@ var minifyCss = require('gulp-minify-css');
 var browserify = require('gulp-browserify');
 var uglify = require('gulp-uglify');
 var es6ify = require('es6ify');
+var jshint = require('gulp-jshint');
 
 var paths = {
   styles: ['static/scss/style.scss'],
@@ -14,13 +15,18 @@ var paths = {
   ],
   scripts: ['app/index.js'],
   scriptsWatch: [
-    '*.js',
-    'app/index.js',
+    'app/*.js',
     'app/actions/*.js',
     'app/components/*.js',
     'app/constants/*.js'
   ]
 };
+
+gulp.task('lint', function() {
+  return gulp.src(paths.scriptsWatch)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'));
+});
 
 gulp.task('styles', function() {
   return gulp.src(paths.styles)

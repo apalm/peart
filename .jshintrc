@@ -1,0 +1,9 @@
+{
+  "camelcase": true,
+  "indent": 2,
+  "newcap": true,
+  "quotmark": "single",
+  "maxlen": 80,
+  "es5": true,
+  "esnext": true
+}

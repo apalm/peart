@@ -60,7 +60,7 @@ var Channel = React.createClass({
           })))
       ]});
   }
-})
+});
 
 var StepSequencer = React.createClass({
   onClick: function(stepIndex) {
@@ -86,7 +86,8 @@ var StepSequencer = React.createClass({
 var SampleSelect = React.createClass({
   // Force initial buffer load.
   componentDidMount: function() {
-    this.props.setSamplePath(this.props.channelList, this.props.value, this.props.id);
+    this.props.setSamplePath(
+      this.props.channelList, this.props.value, this.props.id);
   },
   onChange: function(event) {
     var channelList = this.props.channelList.slice(0);
@@ -103,7 +104,7 @@ var SampleSelect = React.createClass({
     return React.DOM.div({className: 'Grid-cell'},
       React.DOM.select({
         value: this.props.value,
-        onChange: this.onChange}, optionNodes))
+        onChange: this.onChange}, optionNodes));
   }
 });
 
@@ -135,7 +136,8 @@ var ChannelSlider = React.createClass({
 var MuteLink = React.createClass({
   onClick: function() {
     var channelList = this.props.channelList.slice(0);
-    channelList[this.props.index][this.props.key] = !channelList[this.props.index][this.props.key];
+    channelList[this.props.index][this.props.key] =
+      !channelList[this.props.index][this.props.key];
     this.props.setChannelList(channelList);
   },
   render: function() {
@@ -143,7 +145,7 @@ var MuteLink = React.createClass({
       React.DOM.a({
         className: 'Button',
         style: getActiveStyle(this.props.value),
-        onClick: this.onClick}, (this.props.value ? 'unmute' : 'mute')))
+        onClick: this.onClick}, (this.props.value ? 'unmute' : 'mute')));
   }
 });
 
@@ -159,7 +161,7 @@ var DeleteLink = React.createClass({
     return React.DOM.div({className: 'Grid-cell'},
       React.DOM.a({
         className: 'Button Button--danger',
-        onClick: this.onClick}, this.props.title))
+        onClick: this.onClick}, this.props.title));
   }
 });
 

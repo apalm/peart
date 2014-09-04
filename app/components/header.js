@@ -87,7 +87,10 @@ var AddChannelLink = React.createClass({
     this.props.addToChannelList();
   },
   render: function() {
-    return React.DOM.a({className: 'Button', onClick: this.onClick}, 'add channel');
+    return React.DOM.a({
+      className: 'Button',
+      onClick: this.onClick},
+        'add channel');
   }
 });
 
@@ -96,8 +99,10 @@ var PlayLink = React.createClass({
     this.props.setIsPlaying(!this.props.isPlaying);
   },
   render: function() {
-    return React.DOM.a({className: 'Button Button--action', onClick: this.onClick},
-      (this.props.isPlaying ? 'stop' : 'play'));
+    return React.DOM.a({
+      className: 'Button Button--action',
+      onClick: this.onClick},
+        (this.props.isPlaying ? 'stop' : 'play'));
   }
 });
 

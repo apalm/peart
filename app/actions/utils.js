@@ -1,14 +1,14 @@
 var generateId = function() {
-  var id = "";
-  var possible
-    = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var id = '';
+  var possible =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
   for (var i = 0; i < 5; i++) {
     id += possible.charAt(Math.floor(Math.random() * possible.length));
   }
 
   return id;
-}
+};
 
 var lookupChannelIndex = function(channelList, channelId) {
   var lookup = {};
@@ -17,7 +17,7 @@ var lookupChannelIndex = function(channelList, channelId) {
   }
 
   return channelList.indexOf(lookup[channelId]);
-}
+};
 
 var merge = (...args) => Object.assign({}, ...args);
 
