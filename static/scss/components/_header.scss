@@ -1,0 +1,20 @@
+header {
+  display: flex;
+  padding: 1em;
+  align-items: center;
+  background-color: $gray0;
+}
+
+.Header-title {
+  display: flex;
+  align-items: baseline;
+}
+
+.Header-transport {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  a, label {
+    margin-left: 1em;
+  }
+}
