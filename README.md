@@ -20,4 +20,4 @@ If you have found an issue or have a feature suggestion, feel free to submit it 
 
 The Linn LM-1 and Roland TR-707 samples were obtained at [KB6.de](http://samples.kb6.de/).
 
-The SCSS components are from Phillip Walton's excellent [Solved by Flexbox](https://github.com/philipwalton/solved-by-flexbox) project, with some modifications.
+The SCSS components are from Philip Walton's excellent [Solved by Flexbox](https://github.com/philipwalton/solved-by-flexbox) project, with some modifications.
