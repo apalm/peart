@@ -178,9 +178,8 @@ var App = React.createClass({
     gainNode.connect(this.props.audioContext.destination);
 
     source.start(time);
-    // Prevent sample from being cut off when playback rate < 1.
-    // Multiply by 2, since min playback rate = 0.5.
-    source.stop(time + source.buffer.duration * 2);
+    source.stop(time +
+      (source.buffer.duration * Math.pow(source.playbackRate.value, -1)));
   }
 });
 
