@@ -37,3 +37,10 @@
     background-color: $red1;
   }
 }
+
+.Button--on {
+  background-color: $gray2;
+  &:hover, &:active, &:focus {
+    background-color: $gray1;
+  }
+}

@@ -1,6 +1,5 @@
 var React = require('react');
 var {merge} = require('../actions/utils');
-var {getActiveStyle} = require('../actions/style');
 
 var Channels = React.createClass({
   render: function() {
@@ -71,10 +70,13 @@ var StepSequencer = React.createClass({
   },
   render: function() {
     var stepNodes = this.props.sequence.map(function(note, i) {
+      var classes = React.addons.classSet({
+        'Button': true,
+        'Button--on': note
+      });
       return React.DOM.div({className: 'Grid-cell', key: 'step' + i},
         React.DOM.a({
-          style: getActiveStyle(note),
-          className: 'Button',
+          className: classes,
           onClick: this.onClick.bind(null, i)
         }, '\u00a0'));
     }.bind(this));
@@ -141,10 +143,13 @@ var MuteLink = React.createClass({
     this.props.setChannelList(channelList);
   },
   render: function() {
+    var classes = React.addons.classSet({
+      'Button': true,
+      'Button--on': this.props.value
+    });
     return React.DOM.div({className: 'Grid-cell'},
       React.DOM.a({
-        className: 'Button',
-        style: getActiveStyle(this.props.value),
+        className: classes,
         onClick: this.onClick}, (this.props.value ? 'unmute' : 'mute')));
   }
 });
