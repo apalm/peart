@@ -10,19 +10,4 @@ var generateId = function() {
   return id;
 };
 
-var lookupChannelIndex = function(channelList, channelId) {
-  var lookup = {};
-  for (var i = 0, len = channelList.length; i < len; i++) {
-    lookup[channelList[i].id] = channelList[i];
-  }
-
-  return channelList.indexOf(lookup[channelId]);
-};
-
-var merge = (...args) => Object.assign({}, ...args);
-
-module.exports = {
-  generateId,
-  lookupChannelIndex,
-  merge
-};
+module.exports = {generateId};

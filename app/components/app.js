@@ -7,61 +7,40 @@ var Footer = require('./footer');
 
 var initialState = require('../constants/initial-state');
 var utils = require('../actions/utils');
-var {merge} = require('../actions/utils');
 
 var timerID = 0;
 var current16thNote = 0;
 var nextNoteTime = 0;
 
 var App = React.createClass({
-  getInitialState: function() {
-    return (localStorage.getItem('state') === null ?
-      _.cloneDeep(initialState) : JSON.parse(localStorage.getItem('state')));
-  },
   render: function() {
-    return React.DOM.div({
-      className: 'Site',
-      children: [
-        this.getHeader(),
-        this.getMain(),
-        this.getFooter()
-      ]
-    });
-  },
-  getHeader: function() {
-    //return Header(React.addons.update(this.state, {$merge: {
-    return Header(merge(this.state, {
-      setIsPlaying: this.setIsPlaying,
-      setTempo: this.setTempo,
-      setSwing: this.setSwing,
-      resetState: this.resetState,
-      addToChannelList: this.addToChannelList
-    }));
-  },
-  getMain: function() {
-    return React.DOM.main({
-      key: 'main',
-      children: [
-        this.getChannels()
-      ]
-    });
-  },
-  getFooter: function() {
-    return Footer({key: 'footer'});
-  },
-  getChannels: function() {
-    return Channels(merge(this.state, {
-      setSamplePath: this.setSamplePath,
-      setChannelList: this.setChannelList
-    }));
+    return (
+      React.DOM.div({className: 'Site'},
+        Header({
+          tempo: this.props.data.tempo,
+          swing: this.props.data.swing,
+          isPlaying: this.props.data.isPlaying,
+          setIsPlaying: this.setIsPlaying,
+          resetState: this.resetState,
+          addToChannels: this.addToChannels
+        }),
+        React.DOM.main({key: 'main'},
+          Channels({
+            channels: this.props.data.channels,
+            samplePaths: this.props.data.samplePaths,
+            audioContext: this.props.audioContext
+          })
+        ),
+        Footer({key: 'footer'})
+      )
+    );
   },
   componentDidMount: function() {
     // We don't want to autoplay.
     this.setIsPlaying(false);
   },
-  addToChannelList: function() {
-    var channelList = this.state.channelList.slice(0);
-    channelList.push({
+  addToChannels: function() {
+    this.props.data.channels.push({
       id: utils.generateId(),
       volume: 1,
       pitch: 0.5,
@@ -77,64 +56,28 @@ var App = React.createClass({
       sequence: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
       isMuted: false
     });
-    this.setChannelList(channelList);
   },
   resetState: function() {
-    this.setState(_.cloneDeep(initialState));
+    this.props.data.set(_.cloneDeep(initialState));
   },
   componentDidUpdate: function(prevProps, prevState) {
-    if (this.state.isPlaying && !this.state.channelList.length) {
-      this.setIsPlaying(false);
-    }
-    localStorage.setItem('state', JSON.stringify(this.state));
+    localStorage.setItem('state', JSON.stringify(this.props.data.getValue()));
   },
   setIsPlaying: function(isPlaying) {
-    this.setState({isPlaying: isPlaying}, this.updatePlayback);
-  },
-  setTempo: function(tempo) {
-    this.setState({tempo: tempo});
-  },
-  setSwing: function(swing) {
-    this.setState({swing: swing});
-  },
-  setIsMute: function(isMute) {
-    this.setState({isMute: isMute});
-  },
-  setSamplePath: function(channelList, samplePath, channelId) {
-    this.setState({channelList: channelList},
-      this.setBuffer.bind(null, channelList, samplePath, channelId));
-  },
-  setBuffer: function(channelList, samplePath, channelId) {
-    var request = new XMLHttpRequest();
-    request.open('GET', samplePath, true);
-    request.responseType = 'arraybuffer';
-
-    request.onload = function() {
-      this.props.audioContext.decodeAudioData(request.response, function(buf) {
-        var channelList = this.state.channelList.slice(0);
-        channelList[utils.lookupChannelIndex(channelList, channelId)]
-          .buffer = buf;
-        this.setChannelList(channelList);
-      }.bind(this));
-    }.bind(this);
-    request.send();
-  },
-  setChannelList: function(channelList) {
-    this.setState({channelList: channelList});
+    this.props.data.isPlaying.set(isPlaying);
+    this.updatePlayback();
   },
   advanceNote: function() {
-    var secondsPerBeat = 60.0 / this.state.tempo;
-
+    var secondsPerBeat = 60.0 / this.props.data.tempo.getValue();
     if (++current16thNote === 16) {
       current16thNote = 0;
     }
-
     nextNoteTime += (current16thNote % 2 ?
-      (0.25 + 0.08 * this.state.swing) * secondsPerBeat :
-      (0.25 - 0.08 * this.state.swing) * secondsPerBeat);
+      (0.25 + 0.08 * this.props.data.swing.getValue()) * secondsPerBeat :
+      (0.25 - 0.08 * this.props.data.swing.getValue()) * secondsPerBeat);
   },
   updatePlayback: function() {
-    if (this.state.isPlaying) {
+    if (this.props.data.isPlaying.getValue()) {
       current16thNote = 0;
       nextNoteTime = this.props.audioContext.currentTime;
       this.schedule();
@@ -144,34 +87,38 @@ var App = React.createClass({
   },
   schedule: function() {
     while (nextNoteTime < this.props.audioContext.currentTime + 0.100) {
-      for (var i = 0; i < this.state.channelList.length; i++) {
-        if (this.state.channelList[i].sequence[current16thNote] === 1) {
-          this.scheduleSound(nextNoteTime, i);
-        }
-      }
+      this.checkSequence();
       this.advanceNote();
     }
     timerID = window.setTimeout(this.schedule, 25.0);
   },
-  scheduleSound: function(time, i) {
+  checkSequence: function() {
+    this.props.data.channels.forEach(function(channel) {
+      if (channel.sequence[current16thNote].getValue() === 1) {
+        this.scheduleSound(nextNoteTime, channel);
+      }
+    }.bind(this));
+  },
+  scheduleSound: function(time, channel) {
     var source = this.props.audioContext.createBufferSource();
-    source.buffer = this.state.channelList[i].buffer;
+    source.buffer = channel.buffer.getValue();
 
     // Min rate = 0.5, max rate = 2.0.
-    var rate = Math.pow(2.0, 2.0 * (this.state.channelList[i].pitch - 0.5));
+    var rate = Math.pow(
+      2.0, 2.0 * (channel.pitch.getValue() - 0.5));
     source.playbackRate.value = rate;
 
     var panner = this.props.audioContext.createPanner();
     panner.panningModel = 'equalpower';
     panner.setPosition(
-      this.state.channelList[i].pan,
+      channel.pan.getValue(),
       0,
-      (1 - Math.abs(this.state.channelList[i].pan)));
+      (1 - Math.abs(channel.pan.getValue())));
 
     // Prevent clipping when panned.
     var gainNode = this.props.audioContext.createGain();
-    gainNode.gain.value = (this.state.channelList[i].isMuted ?
-      0 : (this.state.channelList[i].volume * 0.8));
+    gainNode.gain.value = (channel.isMuted.getValue() ?
+      0 : (channel.volume.getValue() * 0.8));
 
     source.connect(panner);
     panner.connect(gainNode);

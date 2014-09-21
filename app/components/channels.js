@@ -3,76 +3,87 @@ var {merge} = require('../actions/utils');
 
 var Channels = React.createClass({
   render: function() {
-    var channelNodes = this.props.channelList.map(function(channel, i) {
-      return Channel(merge(this.props, {key: 'channel' + i, index: i}));
+    var channelNodes = this.props.channels.map(function(channel, i) {
+      return Channel({
+        key: 'channel' + i,
+        channels: this.props.channels,
+        channel: channel,
+        samplePaths: this.props.samplePaths,
+        audioContext: this.props.audioContext
+      });
     }.bind(this));
 
-    return React.DOM.div({}, channelNodes);
+    return (
+      React.DOM.div(null, channelNodes)
+    );
   }
 });
 
 var Channel = React.createClass({
   render: function() {
-    return React.DOM.div({
-      className: 'Grid',
-      children: [
-        StepSequencer(merge(this.props, {
+    return (
+      React.DOM.div({className: 'Grid'},
+        StepSequencer({
           key: 'sequence',
-          sequence: this.props.channelList[this.props.index].sequence
-        })),
+          sequence: this.props.channel.sequence
+        }),
         React.DOM.div({className: 'Grid'},
-          SampleSelect(merge(this.props, {
+          SampleSelect({
             key: 'sampleSelect',
-            value: this.props.channelList[this.props.index].samplePath,
-            id: this.props.channelList[this.props.index].id
-          })),
-          ChannelSlider(merge(this.props, {
+            samplePath: this.props.channel.samplePath,
+            buffer: this.props.channel.buffer,
+            samplePaths: this.props.samplePaths,
+            audioContext: this.props.audioContext
+          }),
+          ChannelSlider({
             key: 'volume',
             title: 'volume',
-            value: this.props.channelList[this.props.index].volume,
+            value: this.props.channel.volume,
             min: 0,
             max: 1
-          })),
-          ChannelSlider(merge(this.props, {
+          }),
+          ChannelSlider({
             key: 'pitch',
             title: 'pitch',
-            value: this.props.channelList[this.props.index].pitch,
+            value: this.props.channel.pitch,
             min: 0,
             max: 1
-          })),
-          ChannelSlider(merge(this.props, {
+          }),
+          ChannelSlider({
             key: 'pan',
             title: 'pan',
-            value: this.props.channelList[this.props.index].pan,
+            value: this.props.channel.pan,
             min: -1,
             max: 1
-          })),
-          MuteLink(merge(this.props, {
+          }),
+          MuteLink({
             key: 'isMuted',
             title: 'mute',
-            value: this.props.channelList[this.props.index].isMuted
-          })),
-          DeleteLink(merge(this.props, {
+            value: this.props.channel.isMuted
+          }),
+          DeleteLink({
             key: 'delete',
             title: 'delete',
-            id: this.props.channelList[this.props.index].id
-          })))
-      ]});
+            channels: this.props.channels,
+            value: this.props.channel.id
+          })
+        )
+      )
+    );
   }
 });
 
 var StepSequencer = React.createClass({
   onClick: function(stepIndex) {
-    var channelList = this.props.channelList.slice(0);
-    var stepValue = (this.props.sequence[stepIndex] ? 0 : 1);
-    channelList[this.props.index].sequence[stepIndex] = stepValue;
-    this.props.setChannelList(channelList);
+    this.props.sequence.removeAt(stepIndex);
+    this.props.sequence.insertAt(
+      stepIndex, (this.props.sequence[stepIndex].getValue() ? 0 : 1));
   },
   render: function() {
     var stepNodes = this.props.sequence.map(function(note, i) {
       var classes = React.addons.classSet({
         'Button': true,
-        'Button--on': note
+        'Button--on': note.getValue()
       });
       return React.DOM.div({className: 'Grid-cell', key: 'step' + i},
         React.DOM.a({
@@ -81,41 +92,57 @@ var StepSequencer = React.createClass({
         }, '\u00a0'));
     }.bind(this));
 
-    return React.DOM.div({className: 'Grid'}, stepNodes);
+    return (
+      React.DOM.div({className: 'Grid'}, stepNodes)
+    );
   }
 });
 
 var SampleSelect = React.createClass({
   // Force initial buffer load.
   componentDidMount: function() {
-    this.props.setSamplePath(
-      this.props.channelList, this.props.value, this.props.id);
+    this.loadBuffer(this.props.samplePath.getValue());
   },
   onChange: function(event) {
-    var channelList = this.props.channelList.slice(0);
-    channelList[this.props.index].samplePath = event.target.value;
-    this.props.setSamplePath(channelList, event.target.value, this.props.id);
+    this.props.samplePath.set(event.target.value);
+    this.loadBuffer(event.target.value);
+  },
+  loadBuffer: function(samplePath) {
+    var request = new XMLHttpRequest();
+    request.open('GET', samplePath, true);
+    request.responseType = 'arraybuffer';
+
+    request.onload = function() {
+      this.props.audioContext.decodeAudioData(request.response, function(buf) {
+        this.props.buffer.set(buf);
+      }.bind(this));
+    }.bind(this);
+    request.send();
   },
   render: function() {
     var optionNodes = this.props.samplePaths.map(function(path, i) {
       // The name of the sample follows 'static/samples/'.
-      var sampleName = path.substr(15);
-      return React.DOM.option({key: 'option' + i, value: path}, sampleName);
+      var sampleName = path.getValue().substr(15);
+      return React.DOM.option({
+        key: 'option' + i,
+        value: path.getValue(),
+      }, sampleName);
     });
 
-    return React.DOM.div({className: 'Grid-cell'},
-      React.DOM.select({
-        value: this.props.value,
-        onChange: this.onChange}, optionNodes));
+    return (
+      React.DOM.div({className: 'Grid-cell'},
+        React.DOM.select({
+          value: this.props.samplePath.getValue(),
+          onChange: this.onChange
+        }, optionNodes)
+      )
+    );
   }
 });
 
-
 var ChannelSlider = React.createClass({
   onChange: function(event) {
-    var channelList = this.props.channelList.slice(0);
-    channelList[this.props.index][this.props.key] = event.target.value;
-    this.props.setChannelList(channelList);
+    this.props.value.set(event.target.value);
   },
   render: function() {
     return (
@@ -124,7 +151,7 @@ var ChannelSlider = React.createClass({
         React.DOM.input({
           id: this.props.key,
           type: 'range',
-          value: this.props.value,
+          value: this.props.value.getValue(),
           min: this.props.min,
           max: this.props.max,
           step: '0.1',
@@ -137,36 +164,39 @@ var ChannelSlider = React.createClass({
 
 var MuteLink = React.createClass({
   onClick: function() {
-    var channelList = this.props.channelList.slice(0);
-    channelList[this.props.index][this.props.key] =
-      !channelList[this.props.index][this.props.key];
-    this.props.setChannelList(channelList);
+    this.props.value.set(!this.props.value.getValue());
   },
   render: function() {
     var classes = React.addons.classSet({
       'Button': true,
-      'Button--on': this.props.value
+      'Button--on': this.props.value.getValue()
     });
-    return React.DOM.div({className: 'Grid-cell'},
-      React.DOM.a({
-        className: classes,
-        onClick: this.onClick}, (this.props.value ? 'unmute' : 'mute')));
+    return (
+      React.DOM.div({className: 'Grid-cell'},
+        React.DOM.a({className: classes, onClick: this.onClick},
+          (this.props.value.getValue() ? 'unmute' : 'mute')
+        )
+      )
+    );
   }
 });
 
 var DeleteLink = React.createClass({
   onClick: function() {
-    var channelList = this.props.channelList.slice(0);
-    channelList = channelList.filter(function(channel) {
-      return channel.id !== this.props.id;
+    var index = this.props.channels.findIndex(function(channel) {
+      return channel.id.getValue() === this.props.value.getValue();
     }.bind(this));
-    this.props.setChannelList(channelList);
+    this.props.channels.removeAt(index);
   },
   render: function() {
-    return React.DOM.div({className: 'Grid-cell'},
-      React.DOM.a({
-        className: 'Button Button--danger',
-        onClick: this.onClick}, this.props.title));
+    return (
+      React.DOM.div({className: 'Grid-cell'},
+        React.DOM.a({
+          className: 'Button Button--danger',
+          onClick: this.onClick
+        }, this.props.title)
+      )
+    );
   }
 });
 

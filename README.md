@@ -1,6 +1,6 @@
 # Peart
 
-Peart is a simple drum machine built with [React](http://facebook.github.io/react/) and the [Web Audio API](http://webaudio.github.io/web-audio-api/). It uses [localStorage](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage#localStorage) to persist settings from the previous session.
+Peart is a simple drum machine built using [React](http://facebook.github.io/react/), [Cortex](https://github.com/mquan/cortex), and the [Web Audio API](http://webaudio.github.io/web-audio-api/). It uses [localStorage](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage#localStorage) to persist app settings.
 
 ## Installation and build
 

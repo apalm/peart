@@ -2,8 +2,7 @@ var initialState = {
   isPlaying: false,
   tempo: 120,
   swing: 0,
-  //prevStates: [],
-  channelList: [],
+  channels: [],
   samplePaths: [
     'static/samples/707_BD0.wav',
     'static/samples/707_BD1.wav',
