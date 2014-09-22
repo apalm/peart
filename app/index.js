@@ -18,6 +18,6 @@ var root = React.renderComponent(
   document.body
 );
 
-cortex.on("update", function(data) {
+cortex.on('update', function(data) {
   root.setProps({data: data});
 });
