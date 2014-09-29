@@ -7,6 +7,7 @@ var Cortex = require('cortexjs');
 var initialState = require('./constants/initial-state');
 var App = require('./components/app');
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioContext = new AudioContext();
 
 var state = (localStorage.getItem('state') === null ?
