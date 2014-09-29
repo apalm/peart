@@ -58,6 +58,7 @@ var App = React.createClass({
     });
   },
   resetState: function() {
+    this.setIsPlaying(false);
     this.props.data.set(_.cloneDeep(initialState));
   },
   componentDidUpdate: function(prevProps, prevState) {
