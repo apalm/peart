@@ -19,6 +19,8 @@ var App = React.createClass({
         Header({
           tempo: this.props.data.tempo,
           swing: this.props.data.swing,
+          audioContext: this.props.audioContext,
+          masterGain: this.props.masterGain,
           isPlaying: this.props.data.isPlaying,
           setIsPlaying: this.setIsPlaying,
           resetState: this.resetState,
@@ -123,7 +125,8 @@ var App = React.createClass({
 
     source.connect(panner);
     panner.connect(gainNode);
-    gainNode.connect(this.props.audioContext.destination);
+    gainNode.connect(this.props.masterGain);
+    this.props.masterGain.connect(this.props.audioContext.destination);
 
     source.start(time);
     source.stop(time +

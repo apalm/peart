@@ -1,13 +1,12 @@
 var React = require('react');
-var {merge} = require('../actions/utils');
 
 var Channels = React.createClass({
   render: function() {
     var channelNodes = this.props.channels.map(function(channel, i) {
       return Channel({
         key: 'channel' + i,
-        channels: this.props.channels,
         channel: channel,
+        channels: this.props.channels,
         samplePaths: this.props.samplePaths,
         audioContext: this.props.audioContext
       });

@@ -9,9 +9,12 @@
     "url": "https://github.com/apalm/peart.git"
   },
   "dependencies": {
+    "browserify": "^5.12.1",
     "cortexjs": "^0.6.0",
     "lodash": "^2.4.1",
-    "react": "^0.11.1"
+    "react": "^0.11.1",
+    "recorderjs": "^1.0.1",
+    "workerify": "^0.3.0"
   },
   "devDependencies": {
     "es6ify": "^1.2.0",

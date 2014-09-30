@@ -1,4 +1,5 @@
 var React = require('react');
+var Recorder = require('recorderjs');
 
 var Header = React.createClass({
   render: function() {
@@ -9,6 +10,8 @@ var Header = React.createClass({
           key: 'transport',
           tempo: this.props.tempo,
           swing: this.props.swing,
+          audioContext: this.props.audioContext,
+          masterGain: this.props.masterGain,
           isPlaying: this.props.isPlaying,
           setIsPlaying: this.props.setIsPlaying,
           resetState: this.props.resetState,
@@ -38,6 +41,11 @@ var Transport = React.createClass({
           min: '0',
           max: '1',
           step: '0.1'
+        }),
+        RecordLink({
+          audioContext: this.props.audioContext,
+          masterGain: this.props.masterGain,
+          isPlaying: this.props.isPlaying
         }),
         ResetLink({
           key: 'resetLink',
@@ -75,6 +83,35 @@ var HeaderSlider = React.createClass({
           onChange: this.onChange
         })
       )
+    );
+  }
+});
+
+var RecordLink = React.createClass({
+  getInitialState: function() {
+    return {
+      isRecording: false,
+      recorder: new Recorder(this.props.masterGain)
+    };
+  },
+  onClick: function() {
+    if (!this.state.isRecording) {
+      this.setState({isRecording: true});
+      this.state.recorder.record();
+    } else {
+      this.setState({isRecording: false});
+      this.state.recorder.exportWAV(function(blob) {
+        Recorder.forceDownload(blob);
+      });
+      this.state.recorder.clear();
+    }
+  },
+  render: function() {
+    return (
+      React.DOM.a({
+        className: 'Button',
+        onClick: this.onClick
+      }, (this.state.isRecording ? 'stop recording' : 'record'))
     );
   }
 });

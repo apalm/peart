@@ -10,12 +10,14 @@ var App = require('./components/app');
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioContext = new AudioContext();
 
+var masterGain = audioContext.createGain();
+
 var state = (localStorage.getItem('state') === null ?
   _.cloneDeep(initialState) : JSON.parse(localStorage.getItem('state')));
 var cortex = new Cortex(state);
 
 var root = React.renderComponent(
-  App({audioContext: audioContext, data: cortex}),
+  App({audioContext: audioContext, masterGain: masterGain, data: cortex}),
   document.body
 );
 
